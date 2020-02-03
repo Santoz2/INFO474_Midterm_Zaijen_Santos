@@ -123,7 +123,7 @@
             .attr('r', 3)
             .attr('class', function (d) {
                 var finalClass = "";
-                if(d["Legendary"] == "True") {
+                if (d["Legendary"] == "True") {
                     finalClass = "Legendary";
                 } else {
                     finalClass = "Normal";
@@ -274,5 +274,58 @@
     });
 
     d3.select('p#value-color-picker').text(`#${num2hex(rgb)}`);
+
+    var legendaryValues = ["all", "true", "false"]
+    // add the options to the button
+    d3.select("#legendaryDropDown")
+        .selectAll('myOptions')
+        .data(legendaryValues)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; }) // text showed in the menu
+        .attr("value", function (d) { return d; });
+
+    var generationValues = ["all", "1", "2", "3", "4", "5", "6"]
+    // add the options to the button
+    d3.select("#generationDropDown")
+        .selectAll('myOptions')
+        .data(generationValues)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; }) // text showed in the menu
+        .attr("value", function (d) { return d; });
+
+    function legendaryHandler(selectedOption) {
+        if (selectedOption == "true") {
+            svgContainer.selectAll("circle.Normal").style('opacity', 0);
+        } else if (selectedOption == "false") {
+            svgContainer.selectAll("circle.Legendary").style('opacity', 0);
+        }
+    }
+
+    d3.select("#legendaryDropDown").on("change", function (d) {
+        // recover the option that has been chosen
+        var selectedOption = d3.select(this).property("value");
+        svgContainer.selectAll("circle").style('opacity', 1);
+        legendaryHandler(selectedOption);
+    })
+
+    d3.select("#generationDropDown").on("change", function (d) {
+        // recover the option that has been chosen
+        var selectedOption = d3.select(this).property("value");
+        svgContainer.selectAll("circle").style('opacity', 0);
+        var legendaryStatus = d3.select("#legendaryDropDown").property("value");
+        /*egendaryHandler(legendaryStatus);
+        console.log("Gen" + selectedOption);
+        */
+
+        if (legendaryStatus == "true") {
+            svgContainer.selectAll("circle.Legendary").filter(".Gen" + selectedOption).style('opacity', 1);
+        } else if (legendaryStatus == "false") {
+            svgContainer.selectAll("circle.Normal").filter(".Gen" + selectedOption).style('opacity', 1);
+        } else {
+            svgContainer.selectAll("circle").filter(".Gen" + selectedOption).style('opacity', 1);
+        }
+    })
 
 })()
