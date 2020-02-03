@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>Lab Week 3</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://unpkg.com/d3-simple-slider"></script>
+  <style>
+    div.tooltip {
+      position: absolute;
+      text-align: center;
+      width: 60px;
+      height: 28px;
+      padding: 2px;
+      font: 12px sans-serif;
+      background: lightsteelblue;
+      border: 0px;
+      border-radius: 8px;
+      pointer-events: none;
+    }
+  </style>
+
+</head>
+
+<body>
+  <h1>Pokemon: Special Defense vs Total Stats</h1>
+  <div id="graphContainer"></div>
+  <button id="redButton">
+    Change to Red
+  </button>
+  <button id="blueButton">
+    Change to Blue
+  </button>
+  <h2>Simple</h2>
+  <div class="row align-items-center">
+    <div class="col-sm-2">
+      <p id="value-simple"></p>
+    </div>
+    <div class="col-sm">
+      <div id="slider-simple"></div>
+    </div>
+  </div>
+  <script src="index.js"></script>
+</body>
+
+
+<h2>Color picker</h2>
+<div class="row align-items-center">
+  <div class="col-sm-2">
+    <p id="value-color-picker"></p>
+  </div>
+  <div class="col-sm">
+    <div id="slider-color-picker"></div>
+  </div>
+</div>
+
+</html>
