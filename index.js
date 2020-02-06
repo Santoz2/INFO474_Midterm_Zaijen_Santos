@@ -32,7 +32,7 @@
 
     // load data and append svg to body
     svgContainer = d3.select('#graphContainer').append("svg")
-        .attr('width', measurements.width)
+        .attr('width', measurements.width + 500)
         .attr('height', measurements.height);
     d3.csv("pokemon.csv")
         .then((csvData) => data = csvData)
@@ -130,6 +130,27 @@
             .text("Total");
 
 
+
+
+        svgContainer.append("text")
+            .attr("transform",
+                "translate(" + 1010 + " ," +
+                (30) + ")")
+            .style("text-anchor", "middle")
+            .style("font-weight", "bold")
+            .text("Type 1");
+        let count = 0;
+        Object.entries(colors).forEach(entry => {
+            let key = entry[0];
+            let value = entry[1];
+            console.log(key);
+            console.log(value);
+            svgContainer.append("circle").attr("cx", 1000).attr("cy", 50 + count * 20).attr("r", 6).style("fill", value)
+            svgContainer.append("text").attr("x", 1020).attr("y", 55 + count * 20).text(key).style("font-size", "15px").attr("alignment-baseline", "middle")
+            count++;
+        })
+
+
     }
 
     function findMinMax(spDef, statTotal) {
@@ -213,8 +234,8 @@
                             .duration(200)
                             .style("opacity", .9);
                         div.html(
-                            d["Name"] + "\n " + d["Type 1"] + "\n " + d["Type 2"]
-                            )
+                            d["Name"] + "<br/>" + d["Type 1"] + "<br/>" + d["Type 2"]
+                        )
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     }
@@ -224,7 +245,7 @@
                     div.transition()
                         .duration(200)
                         .style("opacity", .9);
-                    div.html(d["Name"] + "\n " + d["Type 1"] + "\n " + d["Type 2"])
+                    div.html(d["Name"] + "<br/>" + d["Type 1"] + "<br/>" + d["Type 2"])
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 }
@@ -242,9 +263,9 @@
             .data(data)
             .enter()
             .append("text");
-
+ 
         //console.log(text);
-
+ 
         var textLabels = text
             .attr("x", xMap)
             .attr("y", yMap)
@@ -254,8 +275,8 @@
             .attr("fill", "red");
         //#CD0000 Red
         //#4286f4 Blue
-
-
+ 
+ 
         // Define the div for the tooltip
         var div = d3.select("body").append("div")
             .attr("class", "tooltip")
