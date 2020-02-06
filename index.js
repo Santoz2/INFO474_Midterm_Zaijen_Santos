@@ -68,6 +68,53 @@
         drawAxes(scaleX, scaleY)
 
         plotData(scaleX, scaleY)
+        const xMapDisplaced = function (d) { return scaleX(+d["Sp. Def"]) + 5000 }
+        const xMap = function (d) { return scaleX(+d["Sp. Def"])}
+        d3.select("#generationDropDown").on("change", function (d) {
+            // recover the option that has been chosen
+            //const yMap = function (d) { return scaleY(+d["Total"]) }
+            var genStatus = d3.select(this).property("value");
+            svgContainer.selectAll("circle").style('opacity', 0)
+                .attr('cx', xMapDisplaced);
+            var legendaryStatus = d3.select("#legendaryDropDown").property("value");
+            /*egendaryHandler(legendaryStatus);
+            console.log("Gen" + genStatus);
+            */
+            /*
+            if (legendaryStatus == "true") {
+                svgContainer.selectAll("circle.Legendary").filter(".Gen" + genStatus).style('opacity', 1);
+            } else if (legendaryStatus == "false") {
+                svgContainer.selectAll("circle.Normal").filter(".Gen" + genStatus).style('opacity', 1);
+            } else {
+                svgContainer.selectAll("circle").filter(".Gen" + genStatus).style('opacity', 1);
+            }*/
+    
+            legendaryHandler(legendaryStatus, genStatus, xMap);
+        })
+
+        d3.select("#legendaryDropDown").on("change", function (d) {
+            // recover the option that has been chosen
+            svgContainer.selectAll("circle").style('opacity', 0);
+            var legendaryStatus = d3.select(this).property("value");
+            var genStatus = d3.select("#generationDropDown").property("value");
+    
+            console.log(legendaryStatus, genStatus);
+            legendaryHandler(legendaryStatus, genStatus, xMap);
+            /*if (legendaryStatus == "true") {
+                svgContainer.selectAll("circle.Legendary").filter(".Gen" + genStatus).style('opacity', 1);
+            } else if (legendaryStatus == "false") {
+                svgContainer.selectAll("circle.Normal").filter(".Gen" + genStatus).style('opacity', 1);
+            } else {
+                svgContainer.selectAll("circle").filter(".Gen" + genStatus).style('opacity', 1);
+            }*/
+    
+    
+            /*
+            svgContainer.selectAll("circle").style('opacity', 1);
+            legendaryHandler(selectedOption);*/
+        })
+
+
     }
 
     function findMinMax(spDef, statTotal) {
@@ -121,6 +168,7 @@
             .attr('cx', xMap)
             .attr('cy', yMap)
             .attr('r', 3)
+            .attr('aria-label', (d) => d["Name"])
             .attr('class', function (d) {
                 var finalClass = "";
                 if (d["Legendary"] == "True") {
@@ -135,12 +183,36 @@
                 return colors[d["Type 1"]];
             })
             .on("mouseover", function (d) {
-                div.transition()
-                    .duration(200)
-                    .style("opacity", .9);
-                div.html(d["Name"] + " " + d["Total"])
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+                //console.log(this.className.baseVal);
+                var legendaryStatus = d3.select("#legendaryDropDown").property("value");
+                var genStatus = d3.select("#generationDropDown").property("value");
+                console.log(genStatus);
+                var visibleClass = ""
+                if (legendaryStatus == "true") {
+                    visibleClass = visibleClass + "Legendary Gen" + genStatus
+                } else if (legendaryStatus == "false") {
+                    visibleClass = visibleClass + "Normal Gen" + genStatus;
+                } else {
+                    if (genStatus == "all" || this.className.baseVal == "Legendary Gen" + genStatus || this.className.baseVal == "Normal Gen" + genStatus) {
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        div.html(d["Name"] + " " + d["Total"])
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    }
+                }
+
+                if (genStatus == "all" || this.className.baseVal == "Legendary Gen" + genStatus || this.className.baseVal == "Normal Gen" + genStatus) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    div.html(d["Name"] + " " + d["Total"])
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                }
+                console.log(visibleClass);
+                
             })
             .on("mouseout", function (d) {
                 div.transition()
@@ -295,37 +367,30 @@
         .text(function (d) { return d; }) // text showed in the menu
         .attr("value", function (d) { return d; });
 
-    function legendaryHandler(selectedOption) {
-        if (selectedOption == "true") {
-            svgContainer.selectAll("circle.Normal").style('opacity', 0);
-        } else if (selectedOption == "false") {
-            svgContainer.selectAll("circle.Legendary").style('opacity', 0);
+    function legendaryHandler(legendaryStatus, genStatus, xMap) {
+        if (legendaryStatus == "true") {
+            if (genStatus == "all") {
+                svgContainer.selectAll("circle.Legendary").style('opacity', 1).attr('cx', xMap);
+            } else {
+                svgContainer.selectAll("circle.Legendary").filter(".Gen" + genStatus).style('opacity', 1).attr('cx', xMap);
+            }
+        } else if (legendaryStatus == "false") {
+            if (genStatus == "all") {
+                svgContainer.selectAll("circle.Normal").style('opacity', 1).attr('cx', xMap);
+            } else {
+                svgContainer.selectAll("circle.Normal").filter(".Gen" + genStatus).style('opacity', 1).attr('cx', xMap);
+            }
+        } else {
+            if (genStatus == "all") {
+                svgContainer.selectAll("circle").style('opacity', 1).attr('cx', xMap);
+            } else {
+                svgContainer.selectAll("circle").filter(".Gen" + genStatus).style('opacity', 1).attr('cx', xMap);
+            }
         }
     }
 
-    d3.select("#legendaryDropDown").on("change", function (d) {
-        // recover the option that has been chosen
-        var selectedOption = d3.select(this).property("value");
-        svgContainer.selectAll("circle").style('opacity', 1);
-        legendaryHandler(selectedOption);
-    })
+    
 
-    d3.select("#generationDropDown").on("change", function (d) {
-        // recover the option that has been chosen
-        var selectedOption = d3.select(this).property("value");
-        svgContainer.selectAll("circle").style('opacity', 0);
-        var legendaryStatus = d3.select("#legendaryDropDown").property("value");
-        /*egendaryHandler(legendaryStatus);
-        console.log("Gen" + selectedOption);
-        */
-
-        if (legendaryStatus == "true") {
-            svgContainer.selectAll("circle.Legendary").filter(".Gen" + selectedOption).style('opacity', 1);
-        } else if (legendaryStatus == "false") {
-            svgContainer.selectAll("circle.Normal").filter(".Gen" + selectedOption).style('opacity', 1);
-        } else {
-            svgContainer.selectAll("circle").filter(".Gen" + selectedOption).style('opacity', 1);
-        }
-    })
+    
 
 })()
