@@ -69,7 +69,7 @@
 
         plotData(scaleX, scaleY)
         const xMapDisplaced = function (d) { return scaleX(+d["Sp. Def"]) + 5000 }
-        const xMap = function (d) { return scaleX(+d["Sp. Def"])}
+        const xMap = function (d) { return scaleX(+d["Sp. Def"]) }
         d3.select("#generationDropDown").on("change", function (d) {
             // recover the option that has been chosen
             //const yMap = function (d) { return scaleY(+d["Total"]) }
@@ -88,7 +88,7 @@
             } else {
                 svgContainer.selectAll("circle").filter(".Gen" + genStatus).style('opacity', 1);
             }*/
-    
+
             legendaryHandler(legendaryStatus, genStatus, xMap);
         })
 
@@ -97,7 +97,7 @@
             svgContainer.selectAll("circle").style('opacity', 0);
             var legendaryStatus = d3.select(this).property("value");
             var genStatus = d3.select("#generationDropDown").property("value");
-    
+
             console.log(legendaryStatus, genStatus);
             legendaryHandler(legendaryStatus, genStatus, xMap);
             /*if (legendaryStatus == "true") {
@@ -107,12 +107,27 @@
             } else {
                 svgContainer.selectAll("circle").filter(".Gen" + genStatus).style('opacity', 1);
             }*/
-    
-    
+
+
             /*
             svgContainer.selectAll("circle").style('opacity', 1);
             legendaryHandler(selectedOption);*/
         })
+
+        svgContainer.append("text")
+            .attr("transform",
+                "translate(" + 500 + " ," +
+                (490) + ")")
+            .style("text-anchor", "middle")
+            .text("Sp. Def");
+
+        svgContainer.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0)
+            .attr("x", 0 - 250)
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Total");
 
 
     }
@@ -168,7 +183,7 @@
             .attr('cx', xMap)
             .attr('cy', yMap)
             .attr('r', 3)
-            .attr('aria-label', (d) => d["Name"])
+            //.attr('aria-label', (d) => d["Name"])
             .attr('class', function (d) {
                 var finalClass = "";
                 if (d["Legendary"] == "True") {
@@ -197,7 +212,9 @@
                         div.transition()
                             .duration(200)
                             .style("opacity", .9);
-                        div.html(d["Name"] + " " + d["Total"])
+                        div.html(
+                            d["Name"] + "\n " + d["Type 1"] + "\n " + d["Type 2"]
+                            )
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     }
@@ -207,12 +224,12 @@
                     div.transition()
                         .duration(200)
                         .style("opacity", .9);
-                    div.html(d["Name"] + " " + d["Total"])
+                    div.html(d["Name"] + "\n " + d["Type 1"] + "\n " + d["Type 2"])
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 }
                 console.log(visibleClass);
-                
+
             })
             .on("mouseout", function (d) {
                 div.transition()
@@ -389,8 +406,8 @@
         }
     }
 
-    
 
-    
+
+
 
 })()
