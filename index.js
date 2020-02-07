@@ -1,3 +1,9 @@
+/* Zaijen Santos
+   INFO 474
+   2/6/2020
+   Midterm Javascript
+*/
+
 "use strict";
 (function () {
     let data = ""
@@ -11,13 +17,13 @@
 
     const colors = {
         "Bug": "#4E79A7",
-        "Dragon": "#660066",
-        "Rock": "#996633",
         "Dark": "#A0CBE8",
+        "Dragon": "#660066",
         "Electric": "#F28E2B",
         "Fairy": "#ffccff",
         "Fighting": "#59A14F",
         "Fire": "#8CD17D",
+        "Flying": "#ccffff",
         "Ghost": "#B6992D",
         "Grass": "#499894",
         "Ground": "#86BCB6",
@@ -25,9 +31,9 @@
         "Normal": "#E15759",
         "Poison": "#FF9D9A",
         "Psychic": "#79706E",
+        "Rock": "#996633",
         "Steel": "#BAB0AC",
-        "Water": "#D37295",
-        "Flying": "#ccffff"
+        "Water": "#D37295"
     }
 
     // load data and append svg to body
@@ -40,19 +46,8 @@
 
 
     function makeScatterPlot() {
-        // get arrays of GRE Score and Chance of Admit
+        // get arrays of Sp. Def and Total Stats
         let spDef = data.map((row) => parseInt(row["Sp. Def"]))
-
-
-        /*
-
-        Similar to
-        let spDef = []
-        for (let i = 0; I < data.length; i++) {
-            spDef.push(data[i])(["GRE Score"])
-        }
-
-        */
         let statTotal = data.map((row) => parseFloat(row["Total"]))
         // find range of data
         const limits = findMinMax(spDef, statTotal)
@@ -71,49 +66,23 @@
         const xMapDisplaced = function (d) { return scaleX(+d["Sp. Def"]) + 5000 }
         const xMap = function (d) { return scaleX(+d["Sp. Def"]) }
         d3.select("#generationDropDown").on("change", function (d) {
-            // recover the option that has been chosen
-            //const yMap = function (d) { return scaleY(+d["Total"]) }
             var genStatus = d3.select(this).property("value");
             svgContainer.selectAll("circle").style('opacity', 0)
                 .attr('cx', xMapDisplaced);
             var legendaryStatus = d3.select("#legendaryDropDown").property("value");
-            /*egendaryHandler(legendaryStatus);
-            console.log("Gen" + genStatus);
-            */
-            /*
-            if (legendaryStatus == "true") {
-                svgContainer.selectAll("circle.Legendary").filter(".Gen" + genStatus).style('opacity', 1);
-            } else if (legendaryStatus == "false") {
-                svgContainer.selectAll("circle.Normal").filter(".Gen" + genStatus).style('opacity', 1);
-            } else {
-                svgContainer.selectAll("circle").filter(".Gen" + genStatus).style('opacity', 1);
-            }*/
-
             legendaryHandler(legendaryStatus, genStatus, xMap);
         })
 
         d3.select("#legendaryDropDown").on("change", function (d) {
             // recover the option that has been chosen
-            svgContainer.selectAll("circle").style('opacity', 0);
+            svgContainer.selectAll("circle").style('opacity', 0)
+                .attr('cx', xMapDisplaced);
             var legendaryStatus = d3.select(this).property("value");
             var genStatus = d3.select("#generationDropDown").property("value");
-
-            console.log(legendaryStatus, genStatus);
             legendaryHandler(legendaryStatus, genStatus, xMap);
-            /*if (legendaryStatus == "true") {
-                svgContainer.selectAll("circle.Legendary").filter(".Gen" + genStatus).style('opacity', 1);
-            } else if (legendaryStatus == "false") {
-                svgContainer.selectAll("circle.Normal").filter(".Gen" + genStatus).style('opacity', 1);
-            } else {
-                svgContainer.selectAll("circle").filter(".Gen" + genStatus).style('opacity', 1);
-            }*/
-
-
-            /*
-            svgContainer.selectAll("circle").style('opacity', 1);
-            legendaryHandler(selectedOption);*/
         })
 
+        //Add the Axis Labels
         svgContainer.append("text")
             .attr("transform",
                 "translate(" + 500 + " ," +
@@ -129,9 +98,7 @@
             .style("text-anchor", "middle")
             .text("Total");
 
-
-
-
+        //Add the Legend
         svgContainer.append("text")
             .attr("transform",
                 "translate(" + 1010 + " ," +
@@ -143,14 +110,22 @@
         Object.entries(colors).forEach(entry => {
             let key = entry[0];
             let value = entry[1];
-            console.log(key);
-            console.log(value);
-            svgContainer.append("circle").attr("cx", 1000).attr("cy", 50 + count * 20).attr("r", 6).style("fill", value)
-            svgContainer.append("text").attr("x", 1020).attr("y", 55 + count * 20).text(key).style("font-size", "15px").attr("alignment-baseline", "middle")
+            //console.log(key);
+            //console.log(value);
+            svgContainer.append("rect")
+                .attr("x", 1000)
+                .attr("y", 45 + count * 20)
+                .attr("width", 10)
+                .attr("height", 10)
+                .style("fill", value)
+            svgContainer.append("text")
+                .attr("x", 1020)
+                .attr("y", 55 + count * 20)
+                .text(key)
+                .style("font-size", "15px")
+                .attr("alignment-baseline", "middle")
             count++;
         })
-
-
     }
 
     function findMinMax(spDef, statTotal) {
@@ -222,168 +197,42 @@
                 //console.log(this.className.baseVal);
                 var legendaryStatus = d3.select("#legendaryDropDown").property("value");
                 var genStatus = d3.select("#generationDropDown").property("value");
-                console.log(genStatus);
-                var visibleClass = ""
+                var currentLegendary = this.className.baseVal.substring(0, this.className.baseVal.indexOf(' '));
                 if (legendaryStatus == "true") {
-                    visibleClass = visibleClass + "Legendary Gen" + genStatus
+                    if ((genStatus == "all" && currentLegendary == "Legendary") || this.className.baseVal == "Legendary Gen" + genStatus) {
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        div.html(d["Name"] + "<br/>" + d["Type 1"] + "<br/>" + d["Type 2"])
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    }
                 } else if (legendaryStatus == "false") {
-                    visibleClass = visibleClass + "Normal Gen" + genStatus;
+                    if ((genStatus == "all" && currentLegendary == "Normal") || this.className.baseVal == "Normal Gen" + genStatus) {
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        div.html(d["Name"] + "<br/>" + d["Type 1"] + "<br/>" + d["Type 2"])
+                            .style("left", (d3.event.pageX) + "px")
+                            .style("top", (d3.event.pageY - 28) + "px");
+                    }
                 } else {
                     if (genStatus == "all" || this.className.baseVal == "Legendary Gen" + genStatus || this.className.baseVal == "Normal Gen" + genStatus) {
                         div.transition()
                             .duration(200)
                             .style("opacity", .9);
-                        div.html(
-                            d["Name"] + "<br/>" + d["Type 1"] + "<br/>" + d["Type 2"]
-                        )
+                        div.html(d["Name"] + "<br/>" + d["Type 1"] + "<br/>" + d["Type 2"])
                             .style("left", (d3.event.pageX) + "px")
                             .style("top", (d3.event.pageY - 28) + "px");
                     }
                 }
-
-                if (genStatus == "all" || this.className.baseVal == "Legendary Gen" + genStatus || this.className.baseVal == "Normal Gen" + genStatus) {
-                    div.transition()
-                        .duration(200)
-                        .style("opacity", .9);
-                    div.html(d["Name"] + "<br/>" + d["Type 1"] + "<br/>" + d["Type 2"])
-                        .style("left", (d3.event.pageX) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px");
-                }
-                console.log(visibleClass);
-
             })
             .on("mouseout", function (d) {
                 div.transition()
                     .duration(500)
                     .style("opacity", 0);
             });
-        /*
-        //console.log(data);
-        var text = svgContainer.selectAll("text")
-            .data(data)
-            .enter()
-            .append("text");
- 
-        //console.log(text);
- 
-        var textLabels = text
-            .attr("x", xMap)
-            .attr("y", yMap)
-            .text(function (d) { return d["GRE Score"]; })
-            .attr("font-family", "sans-serif")
-            .attr("font-size", "20px")
-            .attr("fill", "red");
-        //#CD0000 Red
-        //#4286f4 Blue
- 
- 
-        // Define the div for the tooltip
-        var div = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-        */
     }
-
-    //function makeBlue() {
-    d3.select("#blueButton").on('click', function () {
-        svgContainer.selectAll("circle.Gen1").attr('fill', '#4286f4');
-        //attr('fill', '#4286f4')
-    })
-
-    d3.select("#redButton").on('click', function () {
-        console.log("nani");
-        svgContainer.selectAll("circle.Normal").attr('fill', '#CD0000');
-        //attr('fill', '#4286f4')
-    })
-    //}
-
-
-    var data2 = [0, 0.005, 0.01, 0.015, 0.02, 0.025];
-
-    var sliderSimple = d3
-        .sliderBottom()
-        .min(d3.min(data2))
-        .max(d3.max(data2))
-        .width(300)
-        .tickFormat(d3.format('.2%'))
-        .ticks(5)
-        .default(0.015)
-        .on('onchange', val => {
-            svgContainer.selectAll("circle").attr('r', (d3.format('.2%')(val)));
-        });
-
-    var gSimple = d3
-        .select('div#slider-simple')
-        .append('svg')
-        .attr('width', 500)
-        .attr('height', 100)
-        .append('g')
-        .attr('transform', 'translate(30,30)');
-
-    gSimple.call(sliderSimple);
-
-    d3.select('p#value-simple').text(d3.format('.2%')(sliderSimple.value()));
-    /*var colorButton = d3.select("#colorButton")
-        .append('select')
-    */
-
-    // Color picker
-    var num2hex = rgb => {
-        return rgb
-            .map(color => {
-                let str = color.toString(16);
-
-                if (str.length === 1) {
-                    str = '0' + str;
-                }
-
-                return str;
-            })
-            .join('');
-    };
-
-    var rgb = [100, 0, 0];
-    //var colors = ['red', 'green', 'blue'];
-
-    var gColorPicker = d3
-        .select('body')
-        .append('svg')
-        .attr('width', 600)
-        .attr('height', 400)
-        .append('g')
-        .attr('transform', 'translate(30,30)');
-
-    var box = gColorPicker
-        .append('rect')
-        .attr('width', 100)
-        .attr('height', 100)
-        .attr('transform', 'translate(400,0)')
-        .attr('fill', `#${num2hex(rgb)}`);
-
-    rgb.forEach((color, i) => {
-        var slider = d3
-            .sliderBottom()
-            .min(0)
-            .max(255)
-            .step(1)
-            .width(300)
-            .default(rgb[i])
-            .displayValue(false)
-            .fill(colors[i])
-            .on('onchange', num => {
-                rgb[i] = num;
-                box.attr('fill', `#${num2hex(rgb)}`);
-                d3.selectAll('circle').attr('fill', `#${num2hex(rgb)}`);
-                d3.select('p#value-color-picker').text(`#${num2hex(rgb)}`);
-            });
-
-        gColorPicker
-            .append('g')
-            .attr('transform', `translate(30,${60 * i})`)
-            .call(slider);
-    });
-
-    d3.select('p#value-color-picker').text(`#${num2hex(rgb)}`);
 
     var legendaryValues = ["all", "true", "false"]
     // add the options to the button
@@ -426,9 +275,4 @@
             }
         }
     }
-
-
-
-
-
 })()
